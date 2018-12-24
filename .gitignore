@@ -1,0 +1,3 @@
+aws-credentials.properties
+packer/authorized_keys
+packer/template.json

@@ -1,0 +1,34 @@
+import os
+import json
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
+LOG = logging.getLogger('infra-as-code')
+TEMPLATE = 'packer/template.tpl'
+
+
+def read_file(template):
+    try:
+        LOG.info("Loading packer file: %s", template)
+        with open(template) as extension:
+            data = extension.read()
+            return json.loads(data)
+    except:
+        LOG.error("Cannot read json file %s", template)
+
+
+def replace_packer(template):
+    LOG.info('Replacing %s', template)
+    json_data = read_file(template)
+    json_data['variables']['destination_regions'] = os.environ['AWS_DEFAULT_REGION']
+    json_data['variables']['aws_vpc_id'] = os.environ['AWS_VPC_ID']
+    json_data['variables']['aws_subnet_id'] = os.environ['AWS_SUBNET_ID']
+
+    LOG.info('Writing packer/template.json')
+    with open('packer/template.json', 'w') as file:
+        json.dump(json_data, file, indent=2)
+
+
+if __name__ == '__main__':
+    replace_packer(TEMPLATE)
