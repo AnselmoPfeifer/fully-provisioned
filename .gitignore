@@ -1,6 +1,6 @@
-aws-credentials.properties
 packer/authorized_keys
 packer/template.json
 terraform/variables.tf
 terraform/.terraform/terraform.tfstate
 terraform/.terraform/plugins/
+chef-engine/Gemfile.lock

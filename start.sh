@@ -9,7 +9,7 @@ echo 'Getting public ssh key'
 cat ~/.ssh/id_rsa.pub > packer/authorized_keys
 
 function exportVariables() {
-    echo 'INFO:ExportING aws credential variables'
+    echo 'INFO:Exporting aws credential variables'
     for env in $(cat aws-credentials.properties); do
         export $env
     done
@@ -43,7 +43,7 @@ EOF
 function terraformExecution() {
     echo 'INFO:Starting replace envs on terraform variables'
     exportVariables ${1}
-    local tfOptions="-no-color -var access_key=${AWS_ACCESS_KEY_ID} -var secret_key=${AWS_SECRET_ACCESS_KEY}"
+    local tfOptions="-var access_key=${AWS_ACCESS_KEY_ID} -var secret_key=${AWS_SECRET_ACCESS_KEY}"
 
     cat terraform/variables-template.tpl \
         | sed "s/<AWS_DEFAULT_REGION>/${AWS_DEFAULT_REGION}/g" \
@@ -69,5 +69,5 @@ function terraformExecution() {
     fi
 }
 
-#packerExecution ${1}
+packerExecution ${1}
 terraformExecution ${1}
