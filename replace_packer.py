@@ -24,6 +24,9 @@ def replace_packer(template):
     json_data['variables']['destination_regions'] = os.environ['AWS_DEFAULT_REGION']
     json_data['variables']['aws_vpc_id'] = os.environ['AWS_VPC_ID']
     json_data['variables']['aws_subnet_id'] = os.environ['AWS_SUBNET_ID']
+    json_data['variables']['aws_access_key'] = os.environ['AWS_ACCESS_KEY_ID']
+    json_data['variables']['aws_secret_key'] = os.environ['AWS_SECRET_ACCESS_KEY']
+    json_data['variables']['ami_name'] = "Image-{}".format(os.environ['AWS_LABEL'])
 
     LOG.info('Writing packer/template.json')
     with open('packer/template.json', 'w') as file:

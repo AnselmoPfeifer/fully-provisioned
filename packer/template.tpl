@@ -4,7 +4,9 @@
     "aws_vpc_id": "<AWS_VPC_ID>",
     "aws_subnet_id": "<AWS_SUBNET_ID>",
     "aws_ssh_username": "ubuntu",
-    "ami_name": "My-Base-Image"
+    "ami_name": "<AWS_LABEL>",
+    "aws_access_key": "<AWS_ACCESS_KEY_ID>",
+    "aws_secret_key": "<AWS_SECRET_ACCESS_KEY>"
   },
 
   "builders": [
