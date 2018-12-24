@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+
+set -e
+
+echo 'INFO: getting public ssh key from ~/.ssh/id_rsa'
+cat ~/.ssh/id_rsa.pub > packer/authorized_keys
+
+# Set the variable using the properties file
+function exportVariables() {
+    echo 'INFO: exporting aws variables'
+    for env in $(cat aws-credentials.properties); do
+        export $env
+    done
+}
+
+# To create the base image
+function packerExecution() {
+    exportVariables
+    echo 'INFO: replacing the packer template'
+    python packer/replace.py
+
+    if [ ${1} == 'test' ]; then
+        echo 'INFO: validating the packer template'
+        packer validate 'packer/template.json'
+        export AWS_AMI_ID='aaaa'
+
+    elif [ ${1} == 'deploy' ]; then
+        echo 'INFO: deploying a new AWS AMI with packer'
+        packer build -force -color=false 'packer/template.json'
+        AMI_ID=$(aws ec2 describe-images --region ${AWS_DEFAULT_REGION}  --filters "Name=tag-key,Values=Name,Name=tag-value,Values=${AWS_LABEL}" --query 'Images[*].{id:ImageId}' | jq .[].id | cut -f2 -d'"')
+
+        cat << EOF >>  'aws-credentials.properties'
+AWS_AMI_ID=${AMI_ID}
+EOF
+        echo "The new image id: ${AWS_AMI_ID}"
+
+     else
+        echo 'ERROR: invalid parameter, try to use, test/deploy'
+        exit 1
+    fi
+}
+
+function terraformExecution() {
+    echo 'INFO: starting replace envs on terraform variables'
+    exportVariables
+
+    cat terraform/variables-template.tpl \
+        | sed "s/<AWS_DEFAULT_REGION>/${AWS_DEFAULT_REGION}/g" \
+        | sed "s/<AWS_AMI_ID>/${AWS_AMI_ID}/g" \
+        | sed "s/<AWS_LABEL>/${AWS_LABEL}/g"  \
+        | sed "s/<AWS_S3_BUCKET>/${AWS_S3_BUCKET}/g"  \
+        > terraform/variables.tf
+
+    if [ ${1} == 'test' ]; then
+        (
+            cd terraform;
+            terraform init;
+            terraform plan
+        )
+
+     elif [ ${1} == 'deploy' ]; then
+         (
+            cd terraform;
+            terraform init;
+            terraform plan;
+            terraform apply -auto-approve;
+            terraform output -json > ../output.json
+         )
+    fi
+}
+
+function chefRelease() {
+    exportVariables
+    echo "INFO: creating new chef release to ${CHEF_VERSION}"
+    if [ ${1} == 'test' ]; then
+        (
+            cd fully-chef/;
+            berks install;
+            berks update
+        )
+
+    elif [ ${1} == 'deploy' ]; then
+        echo "INFO: push the app to s3://${AWS_S3_BUCKET}!"
+        (
+            tar -czvf fibonacci.tar.gz resources/app;
+            aws s3 cp resources/logo.png s3://${AWS_S3_BUCKET}/ --acl public-read;
+            aws s3 cp fibonacci.tar.gz  s3://${AWS_S3_BUCKET}/fibonacci.tar.gz;
+            rm fibonacci.tar.gz
+        )
+
+        echo "INFO: create new chef package and push to s3://${AWS_S3_BUCKET}!"
+        (
+            cd fully-chef/;
+            berks install;
+            berks update;
+            mkdir -p target/cookbooks;
+            berks vendor target/cookbooks
+            zip -r fully-chef/target/cookbooks_${CHEF_VERSION}.zip fully-chef/target/cookbooks
+            aws s3 cp fully-chef/target/cookbooks_${CHEF_VERSION}.zip s3://${AWS_S3_BUCKET}/cookbooks/cookbooks_${CHEF_VERSION}.zip
+        )
+    fi
+}
+
+packerExecution ${1}
+terraformExecution ${1}
+chefRelease ${1}

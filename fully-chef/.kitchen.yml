@@ -1,0 +1,78 @@
+---
+driver:
+  name: vagrant
+
+driver_config:
+  requre_chef_omnibus: true
+  customize:
+    cpus: 1
+    memory: 512
+
+provisioner:
+  product_name: chef
+  product_version: 12.20.3
+
+platforms:
+  - name: debian/stretch64
+
+suites:
+  - name: nginx-php
+    driver:
+      log_level: debug
+      network:
+        - ['public_network', { ip: '192.168.1.110', bridge: 'en0: Wi-Fi (AirPort)' }]
+    run_list:
+      - recipe[fully-chef]
+      - recipe[fully-chef::nginx]
+    attributes: {
+      set_fqdn: 'app-server',
+      fully-chef: {
+        directory: '/fully/data'
+      },
+
+      nginx: { ip_address: '192.168.1.110' }
+    }
+
+  - name: data-base-master
+    driver:
+      log_level: debug
+      network:
+        - ['public_network', { ip: '192.168.1.111', bridge: 'en0: Wi-Fi (AirPort)' }]
+    run_list:
+      - recipe[fully-chef]
+      - recipe[fully-chef::postgresql]
+      - recipe[fully-chef::postgresql-replication]
+    attributes: {
+      set_fqdn: 'data-base-master',
+      postgresql: {
+        replication: true,
+        is_master: true,
+        slave_address: '192.168.1.112',
+        master_address: '192.168.1.111',
+        listen_addresses: '192.168.1.111',
+        master_domain: 'master.postgres.anselmopfeifer.com',
+        slave_domain: 'slave.postgres.anselmopfeifer.com'
+      }
+    }
+
+  - name: data-base-slave
+    driver:
+      log_level: debug
+      network:
+        - ['public_network', { ip: '192.168.1.112', bridge: 'en0: Wi-Fi (AirPort)' }]
+    run_list:
+      - recipe[fully-chef]
+      - recipe[fully-chef::postgresql]
+      - recipe[fully-chef::postgresql-replication]
+    attributes: {
+      set_fqdn: 'data-base-slave',
+      postgresql: {
+        replication: true,
+        is_slave: true,
+        slave_address: '192.168.1.112',
+        master_address: '192.168.1.111',
+        listen_addresses: '192.168.1.112',
+        master_domain: 'master.postgres.anselmopfeifer.com',
+        slave_domain: 'slave.postgres.anselmopfeifer.com'
+       }
+    }
