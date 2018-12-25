@@ -1,0 +1,5 @@
+default['deployment']['package'] = ''
+default['deployment']['folder'] = ''
+default['deployment']['path'] = ''
+default['deployment']['user'] = ''
+default['deployment']['group'] = ''
