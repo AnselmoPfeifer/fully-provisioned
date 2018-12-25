@@ -14,27 +14,39 @@ driver_config:
     - ['../assets', '/tmp/assets']
 
 provisioner:
-  name: chef_solo
-  require_chef_omnibus: 12.20.3
+  product_name: chef
+  product_version: 12.20.3
 
 platforms:
   - name: ubuntu-16.04
 
 suites:
-  - name: default
+  - name: app-server
     driver:
-      log_level: :debug
-#    run_list:
-#      - recipe[fully-chef::default]
-#      - recipe[fully-chef::tomcat]
-#      - recipe[fully-chef::deployment]
-#    attributes: {
-#       set_fqdn: 'fully-chef',
-#       deployment: {
-#        package: 'java-chef-test.war',
-#        folder: '/tmp/assets',
-#        path: '/usr/local/tomcat/webapps/',
-#        user: 'tomcat',
-#        group: 'tomcat'
-#       }
-#    }
+      log_level: debug
+    run_list:
+      - recipe[fully-chef::default]
+      - recipe[fully-chef::nginx]
+    attributes: {
+       set_fqdn: 'app-server'
+    }
+
+  - name: data-base-master
+    driver:
+      log_level: debug
+    run_list:
+      - recipe[fully-chef::default]
+      - recipe[fully-chef::postresql]
+    attributes: {
+       set_fqdn: 'data-base-master'
+    }
+
+  - name: data-base-slave
+    driver:
+      log_level: debug
+    run_list:
+      - recipe[fully-chef::default]
+      - recipe[fully-chef::postresql]
+    attributes: {
+       set_fqdn: 'data-base-slave'
+    }

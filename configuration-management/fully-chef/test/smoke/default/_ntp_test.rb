@@ -1,6 +1,6 @@
 # # encoding: utf-8
 
-# Inspec test for recipe devops-challenge::_ntp
+# Inspec test for recipe fully-chef::_ntp
 
 # The Inspec reference, with examples and extensive documentation, can be
 # found at http://inspec.io/docs/reference/resources/

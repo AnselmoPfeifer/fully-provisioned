@@ -1,6 +1,6 @@
 # # encoding: utf-8
 
-# Inspec test for recipe devops-challenge::_timezone
+# Inspec test for recipe fully-chef::_timezone
 
 # The Inspec reference, with examples and extensive documentation, can be
 # found at http://inspec.io/docs/reference/resources/

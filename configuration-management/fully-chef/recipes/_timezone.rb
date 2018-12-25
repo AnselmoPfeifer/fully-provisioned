@@ -1,5 +1,5 @@
 #
-# Cookbook:: devops-challenge
+# Cookbook:: fully-chef
 # Recipe:: _timezone
 #
 # Copyright:: 2018, Anselmo Pfeifer, All Rights Reserved.

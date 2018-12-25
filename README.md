@@ -8,6 +8,7 @@ Using the automation tools to prepare a FULLY provisioned cloud environment in A
 - JQ
 - Python 2.7
 - AWS-Cli
+- Chef Developer Kit
 
 ## Packer
 
@@ -17,5 +18,7 @@ Using the automation tools to prepare a FULLY provisioned cloud environment in A
 - To create the new coockbook
 ```
 kitchen init --create-gemfile
-bundle install
+chef generate cookbook fully-chef
 ```
+## Likns
+- [Berks](https://docs.chef.io/berkshelf.html)

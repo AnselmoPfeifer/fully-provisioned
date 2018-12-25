@@ -1,8 +1,8 @@
 #
-# Cookbook:: devops-challenge
+# Cookbook:: fully-chef
 # Recipe:: _hardening
 #
-# Copyright:: 2018, The Authors, All Rights Reserved.
+# Copyright:: 2018, Anselmo Pfeifer, All Rights Reserved.
 
 # Actions from hardening
 

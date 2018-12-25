@@ -1,11 +1,12 @@
 #
-# Cookbook:: devops-challenge
+# Cookbook:: fully-chef
 # Recipe:: default
 #
 # Copyright:: 2018, Anselmo Pfeifer, All Rights Reserved.
 
-include_recipe 'devops-challenge::_hardening'
-include_recipe 'devops-challenge::_java'
-include_recipe 'devops-challenge::_timezone'
+apt_update 'update'
+
+include_recipe 'fully-chef::_hardening'
+include_recipe 'fully-chef::_timezone'
 
 
