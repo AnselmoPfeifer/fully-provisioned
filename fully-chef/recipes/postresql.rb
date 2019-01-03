@@ -21,3 +21,23 @@ end
 package "postgresql-#{node['postgresql']['version']}"
 package "postgresql-contrib-#{node['postgresql']['version']}"
 package "postgresql-#{node['postgresql']['version']}-dbg"
+
+if node['postgresql']['replication']
+  archive_path = " /var/lib/pgsql/#{node['postgresql']['version']}/archive/"
+  node.default['postgresql']['listen_addresses'] = node['ipaddress']
+
+  execute 'Creating Archive Path' do
+    command "mkdir -p #{archive_path} && chmod 700  -R #{archive_path} && chown -R postgres:postgres #{archive_path}"
+  end
+end
+
+template "/etc/postgresql/#{node['postgresql']['version']}/main/postgresql.conf" do
+  source 'postgres/postgresql.conf.erb'
+  owner 'postgres'
+  group 'postgres'
+  mode '0644'
+end
+
+service 'postgresql' do
+  action :restart
+end

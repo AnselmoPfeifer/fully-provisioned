@@ -38,7 +38,10 @@ suites:
       - recipe[fully-chef::default]
       - recipe[fully-chef::postresql]
     attributes: {
-       set_fqdn: 'data-base-master'
+       set_fqdn: 'data-base-master',
+       postgresql: {
+        replication: true
+      }
     }
 
   - name: data-base-slave
