@@ -2,5 +2,5 @@ packer/authorized_keys
 packer/template.json
 terraform/variables.tf
 terraform/.terraform/terraform.tfstate
-terraform/.terraform/plugins/
+terraform/.terraform/
 aws-credentials.properties
