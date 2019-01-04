@@ -4,9 +4,6 @@ driver:
 
 driver_config:
   requre_chef_omnibus: true
-  network:
-  - ['forwarded_port', { guest: 8080, host: 8080 }]
-
   customize:
     cpus: 1
     memory: 512
@@ -24,6 +21,8 @@ suites:
   - name: app-server
     driver:
       log_level: debug
+      network:
+        - ['private_network', {ip: '10.0.2.10'}]
     run_list:
       - recipe[fully-chef::default]
       - recipe[fully-chef::nginx]
@@ -34,22 +33,35 @@ suites:
   - name: data-base-master
     driver:
       log_level: debug
+      network:
+        - ['private_network', {ip: '10.0.2.11'}]
     run_list:
       - recipe[fully-chef::default]
-      - recipe[fully-chef::postresql]
+      - recipe[fully-chef::postgresql]
     attributes: {
-       set_fqdn: 'data-base-master',
-       postgresql: {
-        replication: true
+      set_fqdn: 'data-base-master',
+      postgresql: {
+        replication: true,
+        is_master_address: true,
+        master_address: '10.0.2.11',
+        slave_address: '10.0.2.12'
       }
     }
 
   - name: data-base-slave
     driver:
       log_level: debug
+      network:
+        - ['private_network', {ip: '10.0.2.12'}]
     run_list:
       - recipe[fully-chef::default]
-      - recipe[fully-chef::postresql]
+      - recipe[fully-chef::postgresql]
     attributes: {
-       set_fqdn: 'data-base-slave'
+      set_fqdn: 'data-base-slave',
+      postgresql: {
+      replication: true,
+        is_slave_address: true,
+        master_address: '10.0.2.11',
+        slave_address: '10.0.2.12'
+       }
     }

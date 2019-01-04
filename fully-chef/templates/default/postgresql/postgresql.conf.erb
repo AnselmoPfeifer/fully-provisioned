@@ -56,7 +56,7 @@ external_pid_file = '/var/run/postgresql/9.6-main.pid'			# write an extra PID fi
 
 # - Connection Settings -
 
-listen_addresses = '<%= node['postgresql']['listen_addresses'] %>'		# what IP address(es) to listen on;
+listen_addresses = '<%= @listen_addresses %>'		# what IP address(es) to listen on;
 # comma-separated list of addresses;
 # defaults to 'localhost'; use '*' for all
 # (change requires restart)
@@ -177,13 +177,12 @@ dynamic_shared_memory_type = posix	# the default is the first option
 # - Replication mode
 <% if node['postgresql']['replication'] %>
 wal_level = hot_standby
-synchronous_commit = local
 archive_mode = on
-archive_command = 'cp %p /var/lib/pgsql/<% node['postgresql']['version'] %>/archive/%f'
-max_wal_senders = 2
+archive_command = 'cd .'
+max_wal_senders = 1
 wal_keep_segments = 10
 synchronous_standby_names = 'pgslave01'
-
+hot_standby = on
 <% end -%>
 
 #wal_level = minimal			# minimal, replica, or logical
@@ -263,7 +262,6 @@ synchronous_standby_names = 'pgslave01'
 # - Standby Servers -
 
 # These settings are ignored on a master server.
-
 #hot_standby = off			# "on" allows queries during recovery
 # (change requires restart)
 #max_standby_archive_delay = 30s	# max delay before canceling queries
