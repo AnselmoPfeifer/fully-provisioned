@@ -22,8 +22,9 @@ package "postgresql-#{node['postgresql']['version']}"
 package "postgresql-contrib-#{node['postgresql']['version']}"
 package "postgresql-#{node['postgresql']['version']}-dbg"
 
-if node['postgresql']['is_master_address']
+if node['postgresql']['is_master']
   ip_address = node['postgresql']['master_address']
+  replication_address = node['postgresql']['slave_address']
   archive_path = "/var/lib/postgresql/#{node['postgresql']['version']}/archive"
 
   execute 'Creating Archive Path' do
@@ -32,8 +33,9 @@ if node['postgresql']['is_master_address']
 end
 
 
-if node['postgresql']['is_slave_address']
+if node['postgresql']['is_slave']
   ip_address = node['postgresql']['slave_address']
+  replication_address = node['postgresql']['master_address']
   data_path = "/var/lib/postgresql/#{node['postgresql']['version']}/data"
 
   execute 'Creating Archive Path' do
@@ -54,7 +56,9 @@ if node['postgresql']['replication']
     owner 'postgres'
     group 'postgres'
     mode '0644'
-    variables(listen_addresses: ip_address)
+    variables(
+        listen_addresses: ip_address
+    )
   end
 
   template "/etc/postgresql/#{node['postgresql']['version']}/main/pg_hba.conf" do
@@ -62,7 +66,10 @@ if node['postgresql']['replication']
     owner 'postgres'
     group 'postgres'
     mode '0644'
-    variables(slave_ip_address: node['postgresql']['slave_address'])
+    variables(
+        listen_addresses: ip_address,
+        replication_address: replication_address
+    )
   end
 end
 
@@ -70,6 +77,24 @@ service 'postgresql' do
   action :restart
 end
 
-service 'postgresql' do
-  action :restart
+template '/tmp/set_password.sh' do
+  source 'postgresql/set_password.sh.erb'
+  mode '0744'
+  variables(
+      default_username: node['postgresql']['default_username'],
+      default_password: node['postgresql']['default_password'],
+      replication_username: node['postgresql']['replication_username'],
+      replication_password: node['postgresql']['replication_password']
+  )
+end
+
+execute 'force_reset_password' do
+  command 'date > /dev/null'
+  action :nothing
+end
+
+execute 'set_password_postgres' do
+  command 'sh /tmp/set_password.sh'
+  subscribes :run, 'execute[force_reset_password]', :immediately
+  notifies :restart, 'service[postgresql]'
 end

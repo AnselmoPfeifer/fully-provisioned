@@ -4,6 +4,10 @@
 #
 # Copyright:: 2018, Anselmo Pfeifer, All Rights Reserved.
 
+include_recipe 'apt'
+include_recipe 'hostnames'
+include_recipe 'sysctl::apply'
+
 apt_update 'update'
 
 package 'net-tools' do

@@ -176,12 +176,11 @@ dynamic_shared_memory_type = posix	# the default is the first option
 # - Settings -
 # - Replication mode
 <% if node['postgresql']['replication'] %>
-wal_level = hot_standby
+wal_level = 'hot_standby'
 archive_mode = on
 archive_command = 'cd .'
 max_wal_senders = 1
-wal_keep_segments = 10
-synchronous_standby_names = 'pgslave01'
+hot_standby = on
 hot_standby = on
 <% end -%>
 

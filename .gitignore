@@ -4,3 +4,4 @@ terraform/variables.tf
 terraform/.terraform/terraform.tfstate
 terraform/.terraform/
 aws-credentials.properties
+.idea/

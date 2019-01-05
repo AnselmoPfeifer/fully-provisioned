@@ -22,7 +22,7 @@ suites:
     driver:
       log_level: debug
       network:
-        - ['private_network', {ip: '10.0.2.10'}]
+        - ['public_network', {ip: '192.168.1.110', bridge: 'en0: Wi-Fi (AirPort)'}]
     run_list:
       - recipe[fully-chef::default]
       - recipe[fully-chef::nginx]
@@ -34,7 +34,7 @@ suites:
     driver:
       log_level: debug
       network:
-        - ['private_network', {ip: '10.0.2.11'}]
+        - ['public_network', {ip: '192.168.1.111', bridge: 'en0: Wi-Fi (AirPort)'}]
     run_list:
       - recipe[fully-chef::default]
       - recipe[fully-chef::postgresql]
@@ -42,9 +42,9 @@ suites:
       set_fqdn: 'data-base-master',
       postgresql: {
         replication: true,
-        is_master_address: true,
-        master_address: '10.0.2.11',
-        slave_address: '10.0.2.12'
+        is_master: true,
+        master_address: '192.168.1.111',
+        slave_address: '192.168.1.112'
       }
     }
 
@@ -52,7 +52,7 @@ suites:
     driver:
       log_level: debug
       network:
-        - ['private_network', {ip: '10.0.2.12'}]
+        - ['public_network', {ip: '192.168.1.112', bridge: 'en0: Wi-Fi (AirPort)'}]
     run_list:
       - recipe[fully-chef::default]
       - recipe[fully-chef::postgresql]
@@ -60,8 +60,8 @@ suites:
       set_fqdn: 'data-base-slave',
       postgresql: {
       replication: true,
-        is_slave_address: true,
-        master_address: '10.0.2.11',
-        slave_address: '10.0.2.12'
+        is_slave: true,
+        master_address: '192.168.1.111',
+        slave_address: '192.168.1.112'
        }
     }
