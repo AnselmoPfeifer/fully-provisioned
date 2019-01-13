@@ -1,0 +1,6 @@
+Host *
+    User postgres
+    IdentityFile ~/.ssh/id_rsa
+    StrictHostKeyChecking no
+    PreferredAuthentications publickey
+    UserKnownHostsFile=/dev/null

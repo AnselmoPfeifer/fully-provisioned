@@ -60,7 +60,6 @@ openssh_server node['sshd']['config_file']  do
   RSAAuthentication 'yes'
   PubkeyAuthentication 'yes'
   PasswordAuthentication 'no'
-
   Protocol 2
   HostKey %w{ /etc/ssh/ssh_host_rsa_key /etc/ssh/ssh_host_dsa_key /etc/ssh/ssh_host_ecdsa_key /etc/ssh/ssh_host_ed25519_key }
   UsePrivilegeSeparation 'yes'
@@ -95,7 +94,7 @@ node.default['sysctl']['params']['net']['ipv4']['tcp_synack_retries'] = '2'
 node.default['sysctl']['params']['net']['ipv4']['tcp_syn_retries'] = '5'
 
 # b) Disable the ping for the machine.
-node.default['sysctl']['params']['net']['ipv4']['icmp_echo_ignore_all'] = '1'
+node.default['sysctl']['params']['net']['ipv4']['icmp_echo_ignore_all'] = '0'
 
 # c) Ignore messages sent to broadcast
 node.default['sysctl']['params']['net']['ipv4']['icmp_echo_ignore_broadcasts'] = '1'
@@ -105,8 +104,8 @@ node.default['sysctl']['params']['net']['ipv4']['conf']['all']['rp_filter'] = '1
 node.default['sysctl']['params']['net']['ipv4']['conf']['default']['rp_filter'] = '1'
 
 # e) Disabling IP Forward
-node.default['sysctl']['params']['net']['ipv4']['ip_forward'] = '0'
+node.default['sysctl']['params']['net']['ipv4']['ip_forward'] = '1'
 
 # f) Does not accept ICMP redirect
-node.default['sysctl']['params']['net']['ipv4']['conf']['all']['send_redirects'] = '0'
-node.default['sysctl']['params']['net']['ipv4']['conf']['default']['send_redirects'] = '0'
+node.default['sysctl']['params']['net']['ipv4']['conf']['all']['send_redirects'] = '1'
+node.default['sysctl']['params']['net']['ipv4']['conf']['default']['send_redirects'] = '1'

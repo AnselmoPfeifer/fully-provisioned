@@ -38,6 +38,7 @@ suites:
     run_list:
       - recipe[fully-chef::default]
       - recipe[fully-chef::postgresql]
+      - recipe[fully-chef::replication-postgresql]
     attributes: {
       set_fqdn: 'data-base-master',
       postgresql: {
@@ -56,10 +57,11 @@ suites:
     run_list:
       - recipe[fully-chef::default]
       - recipe[fully-chef::postgresql]
+      - recipe[fully-chef::replication-postgresql]
     attributes: {
       set_fqdn: 'data-base-slave',
       postgresql: {
-      replication: true,
+        replication: true,
         is_slave: true,
         master_address: '192.168.1.111',
         slave_address: '192.168.1.112'
