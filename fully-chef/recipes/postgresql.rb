@@ -4,6 +4,10 @@
 #
 # Copyright:: 2018, Anselmo Pfeifer, All Rights Reserved.
 
+data_directory = node['postgresql']['data_directory']
+version = node['postgresql']['version']
+initdb_options = node['postgresql']['initdb_options']
+
 apt_repository node['postgresql']['apt_repository'] do
   uri node['postgresql']['apt_uri']
   distribution "#{node['postgresql']['apt_distribution']}-pgdg"
@@ -22,26 +26,38 @@ package "postgresql-#{node['postgresql']['version']}"
 package "postgresql-contrib-#{node['postgresql']['version']}"
 package "postgresql-#{node['postgresql']['version']}-dbg"
 
-template '/tmp/set_password.sh' do
-  source 'postgresql/set_password.sh.erb'
-  mode '0744'
+template "/etc/postgresql/#{node['postgresql']['version']}/main/postgresql.conf" do
+  source 'postgresql/postgresql.conf.erb'
+  owner 'postgres'
+  group 'postgres'
+  mode '0644'
   variables(
-      default_username: node['postgresql']['default_username'],
-      default_password: node['postgresql']['default_password'],
-      replication_username: node['postgresql']['replication_username'],
-      replication_password: node['postgresql']['replication_password']
+      listen_addresses: node['postgresql']['listen_addresses']
   )
 end
 
-execute 'force_reset_password' do
-  command 'date > /dev/null'
-  action :nothing
+directory data_directory do
+  owner 'postgres'
+  group 'postgres'
+  mode '0700'
+  recursive true
+  not_if { ::File.exist?("#{data_directory}/PG_VERSION") }
 end
 
-execute 'set_password_postgres' do
-  command 'sh /tmp/set_password.sh'
-  subscribes :run, 'execute[force_reset_password]', :immediately
-  notifies :restart, 'service[postgresql]'
+bash 'postgresql initdb' do
+  user 'postgres'
+  code <<-EOC
+/usr/lib/postgresql/#{version}/bin/initdb #{initdb_options} -U postgres -D #{data_directory}
+  EOC
+  not_if { ::File.exist? "#{data_directory}/PG_VERSION" }
+end
+
+directory "#{data_directory}/pg_log" do
+  owner 'postgres'
+  group 'postgres'
+  mode '0700'
+  recursive true
+  not_if { ::File.exist? "#{data_directory}/PG_VERSION" }
 end
 
 service 'postgresql' do

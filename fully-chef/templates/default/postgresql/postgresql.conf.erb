@@ -38,7 +38,7 @@
 # The default values of these variables are driven from the -D command-line
 # option or PGDATA environment variable, represented here as ConfigDir.
 
-data_directory = '/var/lib/postgresql/9.6/main'		# use data in another directory
+data_directory = '<%= node['postgresql']['data_directory'] %>' 		# use data in another directory
 # (change requires restart)
 hba_file = '/etc/postgresql/9.6/main/pg_hba.conf'	# host-based authentication file
 # (change requires restart)
@@ -175,11 +175,11 @@ dynamic_shared_memory_type = posix	# the default is the first option
 
 # - Settings -
 # - Replication mode
-<% if node['postgresql']['replication'] %>
+<% if node['postgresql']['is_master'] %>
 wal_level = 'hot_standby'
 archive_mode = on
 archive_command = 'cd .'
-max_wal_senders = 1
+max_wal_senders = 3
 hot_standby = on
 hot_standby = on
 <% end -%>
@@ -253,13 +253,18 @@ hot_standby = on
 
 # These settings are ignored on a standby server.
 
-#synchronous_standby_names = ''	# standby servers that provide sync rep
+<% if node['postgresql']['is_master'] %>
+synchronous_standby_names = 'pgslave01'	# standby servers that provide sync rep
+<% end -%>
+# synchronous_standby_names = ''
 # number of sync standbys and comma-separated list of application_name
 # from standby(s); '*' = all
 #vacuum_defer_cleanup_age = 0	# number of xacts by which cleanup is delayed
 
 # - Standby Servers -
-
+<% if node['postgresql']['is_slave'] %>
+hot_standby = on
+<% end -%>
 # These settings are ignored on a master server.
 #hot_standby = off			# "on" allows queries during recovery
 # (change requires restart)
@@ -575,7 +580,6 @@ timezone = 'localtime'
 
 # These settings are initialized by initdb, but they can be changed.
 lc_messages = 'en_US.UTF-8'			# locale for system error message
-					# strings
 lc_monetary = 'en_US.UTF-8'			# locale for monetary formatting
 lc_numeric = 'en_US.UTF-8'			# locale for number formatting
 lc_time = 'en_US.UTF-8'				# locale for time formatting

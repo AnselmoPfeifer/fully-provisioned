@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
 set -e
+BUCKET_NAME='chef-deploy'
 
 echo 'Getting public ssh key from ~/.ssh/id_rsa'
 cat ~/.ssh/id_rsa.pub > packer/authorized_keys
 
+# Using the properties file set the variable
 function exportVariables() {
     echo 'INFO:Exporting aws credential variables'
     for env in $(cat aws-credentials.properties); do
@@ -12,6 +14,7 @@ function exportVariables() {
     done
 }
 
+# To create the base image
 function packerExecution() {
     exportVariables ${1}
     echo 'INFO: Replacing the packer template'
@@ -37,6 +40,7 @@ EOF
     fi
 }
 
+# To criate the all aws resources involved in this case.
 function terraformExecution() {
     echo 'INFO:Starting replace envs on terraform variables'
     exportVariables ${1}
@@ -66,5 +70,22 @@ function terraformExecution() {
     fi
 }
 
+# to execute the chef deploy
+function chefDeploy() {
+    (
+        cd fully-chef/;
+        berks install;
+        berks update;
+        mkdir -p target/cookbooks;
+        berks vendor target/cookbooks
+        cd target;
+        tar cvf cookbooks_master.tar.gz cookbooks
+    )
+    aws s3 cp resources/master-database.json s3://${BUCKET_NAME}/master-database.json
+    aws s3 cp resources/slave-database.json s3://${BUCKET_NAME}/slave-database.json
+    aws s3 cp fully-chef/target/cookbooks_master.tar.gz s3://${BUCKET_NAME}/cookbooks/cookbooks_master.tar.gz
+}
+
 packerExecution ${1}
 terraformExecution ${1}
+chefDeploy

@@ -16,7 +16,7 @@ depends 'sysctl',     '= 0.7.0'
 depends 'hostnames',  '= 0.4.2'
 depends 'apt',        '= 7.0.0'
 depends 'sshd',       '= 1.3.1'
-depends 'psql',       '~> 0.2.0'
+depends 'hosts_file', '= 0.2.2'
 
 recipe 'fully-chef::_hardening',  'Is the Internal recipe to apply the hardening options'
 recipe 'fully-chef::_timezone',   'Is the Internal recipe to configure timezone'

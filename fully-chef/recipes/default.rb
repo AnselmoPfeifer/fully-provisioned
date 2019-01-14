@@ -10,6 +10,10 @@ include_recipe 'sysctl::apply'
 
 apt_update 'update'
 
+package 'htop' do
+  action :install
+end
+
 package 'net-tools' do
   action :install
 end

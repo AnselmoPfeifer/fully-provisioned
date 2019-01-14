@@ -1,0 +1,7 @@
+{
+  "set_fqdn":"app-server",
+  "run_list":[
+    "recipe[fully-chef::default]",
+    "recipe[fully-chef::nginx]"
+  ]
+}

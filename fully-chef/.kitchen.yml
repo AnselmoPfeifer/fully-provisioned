@@ -8,7 +8,7 @@ driver_config:
     cpus: 1
     memory: 512
   synced_folders:
-    - ['../assets', '/tmp/assets']
+    - ['../resources', '/tmp/resources']
 
 provisioner:
   product_name: chef
@@ -22,7 +22,7 @@ suites:
     driver:
       log_level: debug
       network:
-        - ['public_network', {ip: '192.168.1.110', bridge: 'en0: Wi-Fi (AirPort)'}]
+        - ['public_network', { ip: '192.168.1.110', bridge: 'en0: Wi-Fi (AirPort)' }]
     run_list:
       - recipe[fully-chef::default]
       - recipe[fully-chef::nginx]
@@ -34,18 +34,21 @@ suites:
     driver:
       log_level: debug
       network:
-        - ['public_network', {ip: '192.168.1.111', bridge: 'en0: Wi-Fi (AirPort)'}]
+        - ['public_network', { ip: '192.168.1.111', bridge: 'en0: Wi-Fi (AirPort)' }]
     run_list:
       - recipe[fully-chef::default]
       - recipe[fully-chef::postgresql]
-      - recipe[fully-chef::replication-postgresql]
+      - recipe[fully-chef::postgresql-replication]
     attributes: {
       set_fqdn: 'data-base-master',
       postgresql: {
         replication: true,
         is_master: true,
+        slave_address: '192.168.1.112',
         master_address: '192.168.1.111',
-        slave_address: '192.168.1.112'
+        listen_addresses: '192.168.1.111',
+        master_domain: 'master.postgres.anselmopfeifer.com',
+        slave_domain: 'slave.postgres.anselmopfeifer.com'
       }
     }
 
@@ -53,17 +56,20 @@ suites:
     driver:
       log_level: debug
       network:
-        - ['public_network', {ip: '192.168.1.112', bridge: 'en0: Wi-Fi (AirPort)'}]
+        - ['public_network', { ip: '192.168.1.112', bridge: 'en0: Wi-Fi (AirPort)' }]
     run_list:
       - recipe[fully-chef::default]
       - recipe[fully-chef::postgresql]
-      - recipe[fully-chef::replication-postgresql]
+      - recipe[fully-chef::postgresql-replication]
     attributes: {
       set_fqdn: 'data-base-slave',
       postgresql: {
         replication: true,
         is_slave: true,
+        slave_address: '192.168.1.112',
         master_address: '192.168.1.111',
-        slave_address: '192.168.1.112'
+        listen_addresses: '192.168.1.112',
+        master_domain: 'master.postgres.anselmopfeifer.com',
+        slave_domain: 'slave.postgres.anselmopfeifer.com'
        }
     }

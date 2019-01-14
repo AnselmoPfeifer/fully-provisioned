@@ -71,6 +71,9 @@
 # "host" records.  In that case you will also need to make PostgreSQL
 # listen on a non-local interface via the listen_addresses
 # configuration parameter, or via the -i or -h command line switches.
+<% node['postgresql']['pg_hba'].each do |hba| %>
+<%= hba[:type] %>    <%= hba[:db] %>     <%= hba[:user] %>        <%= hba[:addr] %>/32            <%= hba[:method] %>
+<% end %>
 
 # DO NOT DISABLE!
 # If you change this first entry you will need to make sure that the
@@ -90,14 +93,3 @@ host    all             all             127.0.0.1/32            md5
 # IPv6 local connections:
 host    all             all             ::1/128                 md5
 
-<% if node['postgresql']['replication'] %>
-# Allow replication connections from localhost, by a user with the
-# replication privilege.
-local   replication     postgres                                peer
-host    replication     postgres        127.0.0.1/32            md5
-host    replication     postgres        ::1/128                 md5
-# The local address
-host    replication     postgres        <%= @listen_addresses %>/32        md5
-# The replication address
-host    replication     postgres        <%= @replication_address %>/32        md5
-<% end -%>

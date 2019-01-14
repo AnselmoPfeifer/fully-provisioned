@@ -1,0 +1,17 @@
+{
+  "set_fqdn":"data-base-slave",
+  "postgresql":{
+    "replication":true,
+    "is_slave":true,
+    "slave_address":"10.0.0.11",
+    "master_address":"10.0.0.10",
+    "listen_addresses":"10.0.0.11",
+    "master_domain":"master.postgres.anselmopfeifer.com",
+    "slave_domain":"slave.postgres.anselmopfeifer.com"
+  },
+  "run_list":[
+    "recipe[fully-chef::default]",
+    "recipe[fully-chef::postgresql]",
+    "recipe[fully-chef::postgresql-replication]"
+  ]
+}
