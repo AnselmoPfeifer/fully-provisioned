@@ -8,14 +8,14 @@ driver_config:
     cpus: 1
     memory: 512
   synced_folders:
-    - ['../resources', '/tmp/resources']
+    - ['../resources/', '/tmp/resources']
 
 provisioner:
   product_name: chef
   product_version: 12.20.3
 
 platforms:
-  - name: ubuntu-16.04
+  - name: debian/stretch64
 
 suites:
   - name: app-server

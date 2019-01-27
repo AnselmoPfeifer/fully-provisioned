@@ -1,32 +1,24 @@
-output "app-server" {
+output "instances" {
   value = {
-    name = "${aws_instance.app-server.tags.Name}",
-    public-dns = "${aws_instance.app-server.public_dns}",
-    ports = [
-      "22",
-      "80"
+    app-server = [
+      "${aws_instance.app-server.tags.Name}",
+      "${aws_instance.app-server.public_dns}",
+      "${aws_instance.app-server.private_ip}",
+      ["22", "80"]
     ]
-  }
-}
 
-output "database-master" {
-  value = {
-    name = "${aws_instance.data-base-master.tags.Name}",
-    public-dns = "${aws_instance.data-base-master.public_dns}",
-    ports = [
-      "22",
-      "5432"
+    database-master = [
+      "${aws_instance.data-base-master.tags.Name}",
+      "${aws_instance.data-base-master.public_dns}",
+      "${aws_instance.data-base-master.private_ip}",
+      ["22", "5432"]
     ]
-  }
-}
 
-output "database-slave" {
-  value = {
-    name = "${aws_instance.data-base-slave.tags.Name}",
-    public-dns = "${aws_instance.data-base-slave.public_dns}",
-    ports = [
-      "22",
-      "5432"
+    database-slave = [
+      "${aws_instance.data-base-slave.tags.Name}",
+      "${aws_instance.data-base-slave.public_dns}",
+      "${aws_instance.data-base-slave.private_ip}",
+      ["22", "5432"]
     ]
   }
 }

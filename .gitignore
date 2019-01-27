@@ -4,3 +4,5 @@ terraform/variables.tf
 terraform/.terraform/terraform.tfstate
 terraform/.terraform/
 .idea/
+aws-credentials.properties
+output.json

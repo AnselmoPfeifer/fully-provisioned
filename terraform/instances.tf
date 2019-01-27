@@ -12,7 +12,8 @@ resource "aws_instance" "app-server" {
   monitoring = false
 
   security_groups = [
-    "${aws_security_group.internal_access.id}"
+    "${aws_security_group.internal_access.id}",
+    "${aws_security_group.external_access.id}"
   ]
 
   lifecycle {
@@ -20,7 +21,7 @@ resource "aws_instance" "app-server" {
   }
 
   tags {
-    Name = "App-Server"
+    Name = "app-server"
   }
 }
 
@@ -33,7 +34,8 @@ resource "aws_instance" "data-base-master" {
   monitoring = false
 
   security_groups = [
-    "${aws_security_group.internal_access.id}"
+    "${aws_security_group.internal_access.id}",
+    "${aws_security_group.external_access.id}"
   ]
 
   lifecycle {
@@ -41,7 +43,7 @@ resource "aws_instance" "data-base-master" {
   }
 
   tags {
-    Name = "Data-Base-Server-1"
+    Name = "postgres-master"
   }
 }
 
@@ -54,7 +56,8 @@ resource "aws_instance" "data-base-slave" {
   monitoring = false
 
   security_groups = [
-    "${aws_security_group.internal_access.id}"
+    "${aws_security_group.internal_access.id}",
+    "${aws_security_group.external_access.id}"
   ]
 
   lifecycle {
@@ -62,6 +65,6 @@ resource "aws_instance" "data-base-slave" {
   }
 
   tags {
-    Name = "Data-Base-Server-2"
+    Name = "postgres-slave"
   }
 }

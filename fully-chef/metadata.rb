@@ -5,7 +5,7 @@ license 'All Rights Reserved'
 
 description 'Installs/Configures fully-chef'
 long_description 'Installs/Configures fully-chef'
-version '0.1.0'
+version '1.0.1'
 chef_version '>= 12.1' if respond_to?(:chef_version)
 
 issues_url 'https://github.com/AnselmoPfeifer/fully-provisioned/issues'
@@ -23,4 +23,3 @@ recipe 'fully-chef::_timezone',   'Is the Internal recipe to configure timezone'
 recipe 'fully-chef::default',     'Install and configure linux environment'
 recipe 'fully-chef::nginx',       'Web Server to host the PHP Application'
 recipe 'fully-chef::postgresql',  'Install and configure the postgresql database'
-recipe 'fully-chef::deployment',  'Execute the deploy on web server'
