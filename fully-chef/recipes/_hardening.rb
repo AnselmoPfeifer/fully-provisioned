@@ -2,7 +2,7 @@
 # Cookbook:: fully-chef
 # Recipe:: _hardening
 #
-# Copyright:: 2018, Anselmo Pfeifer, All Rights Reserved.
+# Copyright:: 2019, Anselmo Pfeifer, All Rights Reserved.
 
 # Actions from hardening
 

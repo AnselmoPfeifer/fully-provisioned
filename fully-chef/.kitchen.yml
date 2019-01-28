@@ -7,8 +7,6 @@ driver_config:
   customize:
     cpus: 1
     memory: 512
-  synced_folders:
-    - ['../resources/', '/tmp/resources']
 
 provisioner:
   product_name: chef
@@ -18,16 +16,18 @@ platforms:
   - name: debian/stretch64
 
 suites:
-  - name: app-server
+  - name: nginx-php
     driver:
       log_level: debug
       network:
         - ['public_network', { ip: '192.168.1.110', bridge: 'en0: Wi-Fi (AirPort)' }]
     run_list:
-      - recipe[fully-chef::default]
+      - recipe[fully-chef]
       - recipe[fully-chef::nginx]
     attributes: {
-       set_fqdn: 'app-server'
+       set_fqdn: 'app-server',
+       fully-chef: {directory: '/fully/data'},
+       nginx: {ip_address: '192.168.1.110'}
     }
 
   - name: data-base-master
@@ -36,7 +36,7 @@ suites:
       network:
         - ['public_network', { ip: '192.168.1.111', bridge: 'en0: Wi-Fi (AirPort)' }]
     run_list:
-      - recipe[fully-chef::default]
+      - recipe[fully-chef]
       - recipe[fully-chef::postgresql]
       - recipe[fully-chef::postgresql-replication]
     attributes: {
@@ -58,7 +58,7 @@ suites:
       network:
         - ['public_network', { ip: '192.168.1.112', bridge: 'en0: Wi-Fi (AirPort)' }]
     run_list:
-      - recipe[fully-chef::default]
+      - recipe[fully-chef]
       - recipe[fully-chef::postgresql]
       - recipe[fully-chef::postgresql-replication]
     attributes: {

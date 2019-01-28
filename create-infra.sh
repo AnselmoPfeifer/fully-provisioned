@@ -62,12 +62,30 @@ function chefRelease() {
     exportVariables
     echo "INFO: creating new chef release to ${CHEF_VERSION}"
     if [ ${1} == 'test' ]; then
-        (cd fully-chef/; berks install; berks update)
+        (
+            cd fully-chef/;
+            berks install;
+            berks update
+        )
 
     elif [ ${1} == 'deploy' ]; then
-        (cd fully-chef/; berks install; berks update; mkdir -p target/cookbooks; berks vendor target/cookbooks)
-        zip -r fully-chef/target/cookbooks_${CHEF_VERSION}.zip fully-chef/target/cookbooks
-        aws s3 cp fully-chef/target/cookbooks_${CHEF_VERSION}.zip s3://${AWS_S3_BUCKET}/cookbooks/cookbooks_${CHEF_VERSION}.zip
+        (
+            tar -czvf fibonacci.tar.gz app;
+            aws s3 cp resources/logo.png s3://fully-provisioned/ --acl public-read;
+            aws s3 cp fibonacci.tar.gz  s3://fully-provisioned/fibonacci.tar.gz public-read;
+            rm fibonacci.tar.gz
+        )
+        (
+            cd fully-chef/;
+            berks install;
+            berks update;
+            mkdir -p target/cookbooks;
+            berks vendor target/cookbooks
+        )
+        (
+            zip -r fully-chef/target/cookbooks_${CHEF_VERSION}.zip fully-chef/target/cookbooks
+            aws s3 cp fully-chef/target/cookbooks_${CHEF_VERSION}.zip s3://${AWS_S3_BUCKET}/cookbooks/cookbooks_${CHEF_VERSION}.zip
+        )
     fi
 }
 
