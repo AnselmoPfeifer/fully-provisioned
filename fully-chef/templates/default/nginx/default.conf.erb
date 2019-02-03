@@ -19,6 +19,17 @@ server {
     try_files $uri $uri/ =404;
   }
 
+
+  location /blacklisted {
+    alias <%= @default_directory %>/blacklisted;
+    try_files $uri $uri/ @nested;
+
+    access_log <%= @log_dir %>/access_blacklisted.log;
+    error_log <%= @log_dir %>/error_blacklisted.log;
+
+    include blockips.conf;
+  }
+
   location ~ \.php$ {
     include snippets/fastcgi-php.conf;
     fastcgi_pass unix:/run/php/php7.0-fpm.sock;

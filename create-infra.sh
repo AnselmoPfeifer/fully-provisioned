@@ -70,7 +70,7 @@ function chefRelease() {
 
     elif [ ${1} == 'deploy' ]; then
         (
-            tar -czvf fibonacci.tar.gz app;
+            tar -czvf fibonacci.tar.gz resources/app;
             aws s3 cp resources/logo.png s3://fully-provisioned/ --acl public-read;
             aws s3 cp fibonacci.tar.gz  s3://fully-provisioned/fibonacci.tar.gz public-read;
             rm fibonacci.tar.gz
