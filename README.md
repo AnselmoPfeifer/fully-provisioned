@@ -47,13 +47,12 @@ that configurations are applied consistently in every environment, at any scale.
 
 ## Chef-Engine
 * To create the new coockbook ```chef generate cookbook fully-chef```
-- The main Recipes: postgres 9.6, Nginx
+- The main Recipes: postgres 9.6, Nginx + PHP
 
-## Infra and Chef Provision
-* To deploy the infra and chef on aws cloud execute create-infra.sh with buid/test parameter like this example:
-```create-infra.sh  test```
-- use test to check the packer and terraform files
-- use build to deploy the infrastruture on aws cloud provider
-* To execute chef provision on all aws instances execute the chef-provison.sh
-
+## Infra and Chef Release
+* To deploy the infra and chef on aws cloud execute create-infra with deploy/test parameter like this example:
+```create-infra.sh test```
+- test to check the packer and terraform files
+- deploy to deploy the infrastruture on aws cloud provider
+* To execute chef provision on all aws instances execute the chef-provison
 

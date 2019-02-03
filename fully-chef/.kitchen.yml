@@ -25,9 +25,12 @@ suites:
       - recipe[fully-chef]
       - recipe[fully-chef::nginx]
     attributes: {
-       set_fqdn: 'app-server',
-       fully-chef: {directory: '/fully/data'},
-       nginx: {ip_address: '192.168.1.110'}
+      set_fqdn: 'app-server',
+      fully-chef: {
+        directory: '/fully/data'
+      },
+
+      nginx: { ip_address: '192.168.1.110' }
     }
 
   - name: data-base-master

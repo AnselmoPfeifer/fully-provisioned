@@ -6,21 +6,27 @@
 
 blacklisted = "#{node['nginx']['default_directory']}/blacklisted"
 
-include_recipe 'fully-chef::php-fpm'
-
-package 'nginx' do
-  action :install
-end
-
 user 'www-data' do
   home node['nginx']['default_directory']
   shell '/bin/bash'
   manage_home true
-  action :nothing
+  system true
+  action :create
 end
 
-sudo 'www-data' do
-  user 'www-data'
+file '/etc/sudoers.d/www-data' do
+  mode 0600
+  content <<-EOF
+www-data ALL=(ALL) NOPASSWD:ALL
+  EOF
+  owner 'root'
+  group 'root'
+end
+
+include_recipe 'fully-chef::php-fpm'
+
+package 'nginx' do
+  action :install
 end
 
 directory node['nginx']['default_directory'] do
@@ -37,24 +43,8 @@ directory blacklisted do
   action :create
 end
 
-def enable_sites(file_name)
-  link "/etc/nginx/sites-enabled/#{file_name}" do
-    to "/etc/nginx/sites-available/#{file_name}"
-  end
-end
-
-template '/etc/nginx/sites-available/default' do
-  source 'nginx/default.conf.erb'
-  variables({
-    :ip_address => node['nginx']['ip_address'],
-    :default_directory => node['nginx']['default_directory'],
-    :domains => node['nginx']['domains'],
-    :log_dir => node['nginx']['log_dir']
-   })
-end
-
-cookbook_file "#{node['nginx']['default_directory']}/info.php" do
-  source 'nginx/info.php'
+cookbook_file '/etc/nginx/blockips.conf' do
+  source 'nginx/blockips.conf'
   mode 0644
   group 'www-data'
   owner 'www-data'
@@ -67,28 +57,34 @@ cookbook_file "#{node['nginx']['default_directory']}/index.php" do
   owner 'www-data'
 end
 
-file '/etc/nginx/blockips.conf' do
-  mode 0644
-  group 'www-data'
-  owner 'www-data'
-  action :nothing
-end
-
 cookbook_file "#{blacklisted}/index.php" do
   source 'nginx/blacklisted.php'
   mode 0644
+end
+
+def enable_sites(file_name)
+  link "/etc/nginx/sites-enabled/#{file_name}" do
+    to "/etc/nginx/sites-available/#{file_name}"
+  end
+end
+
+link "#{blacklisted}/blockips.txt" do
+  to '/etc/nginx/blockips.conf'
   group 'www-data'
   owner 'www-data'
 end
 
-link '/etc/nginx/blockips.conf' do
-  to "#{blacklisted}/blockips.txt"
-  link_type :symbolic
-  group 'www-data'
-  owner 'www-data'
-  action :create
-  not_if { ::File.exist?("#{blacklisted}/blockips.txt") }
+template '/etc/nginx/sites-available/default' do
+  source 'nginx/default.conf.erb'
+  variables({
+    :ip_address => node['nginx']['ip_address'],
+    :default_directory => node['nginx']['default_directory'],
+    :domains => node['nginx']['domains'],
+    :log_dir => node['nginx']['log_dir']
+   })
 end
+
+enable_sites 'default'
 
 service 'nginx' do
   service_name 'nginx'

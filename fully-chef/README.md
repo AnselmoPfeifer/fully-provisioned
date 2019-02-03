@@ -1,4 +1,4 @@
 # Fully Chef
 
-- Is the configuration management using chef
+- Configuration management using CHEF
 
