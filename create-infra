@@ -17,7 +17,7 @@ function exportVariables() {
 function packerExecution() {
     exportVariables
     echo 'INFO: replacing the packer template'
-    python replace_packer.py
+    python packer/replace.py
 
     if [ ${1} == 'test' ]; then
         echo 'INFO: validating the packer template'

@@ -10,6 +10,6 @@
   },
 
   "nginx": {
-    "ip_address": "192.168.1.110"
+    "ip_address": "<EXTERNAL_IP>"
   }
 }
