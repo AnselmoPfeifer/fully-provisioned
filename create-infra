@@ -22,6 +22,7 @@ function packerExecution() {
     if [ ${1} == 'test' ]; then
         echo 'INFO: validating the packer template'
         packer validate 'packer/template.json'
+        export AWS_AMI_ID='aaaa'
 
     elif [ ${1} == 'deploy' ]; then
         echo 'INFO: deploying a new AWS AMI with packer'
@@ -51,10 +52,20 @@ function terraformExecution() {
         > terraform/variables.tf
 
     if [ ${1} == 'test' ]; then
-        (cd terraform; terraform init; terraform plan)
+        (
+            cd terraform;
+            terraform init;
+            terraform plan
+        )
 
      elif [ ${1} == 'deploy' ]; then
-         (cd terraform; terraform init; terraform plan; terraform apply -auto-approve; terraform output -json > ../output.json)
+         (
+            cd terraform;
+            terraform init;
+            terraform plan;
+            terraform apply -auto-approve;
+            terraform output -json > ../output.json
+         )
     fi
 }
 
@@ -69,20 +80,21 @@ function chefRelease() {
         )
 
     elif [ ${1} == 'deploy' ]; then
+        echo "INFO: push the app to s3://${AWS_S3_BUCKET}!"
         (
             tar -czvf fibonacci.tar.gz resources/app;
-            aws s3 cp resources/logo.png s3://fully-provisioned/ --acl public-read;
-            aws s3 cp fibonacci.tar.gz  s3://fully-provisioned/fibonacci.tar.gz public-read;
+            aws s3 cp resources/logo.png s3://${AWS_S3_BUCKET}/ --acl public-read;
+            aws s3 cp fibonacci.tar.gz  s3://${AWS_S3_BUCKET}/fibonacci.tar.gz;
             rm fibonacci.tar.gz
         )
+
+        echo "INFO: create new chef package and push to s3://${AWS_S3_BUCKET}!"
         (
             cd fully-chef/;
             berks install;
             berks update;
             mkdir -p target/cookbooks;
             berks vendor target/cookbooks
-        )
-        (
             zip -r fully-chef/target/cookbooks_${CHEF_VERSION}.zip fully-chef/target/cookbooks
             aws s3 cp fully-chef/target/cookbooks_${CHEF_VERSION}.zip s3://${AWS_S3_BUCKET}/cookbooks/cookbooks_${CHEF_VERSION}.zip
         )
