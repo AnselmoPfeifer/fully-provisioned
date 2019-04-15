@@ -53,6 +53,6 @@ that configurations are applied consistently in every environment, at any scale.
 * To deploy the infra and chef on aws cloud execute create-infra with deploy/test parameter like this example:
 ```create-infra.sh test```
 - test to check the packer and terraform files
-- deploy to deploy the infrastruture on aws cloud provider
+- deploy to create the infrastruture on aws cloud provider
 * To execute chef provision on all aws instances execute the chef-provison
 
